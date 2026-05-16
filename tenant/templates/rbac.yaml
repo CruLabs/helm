@@ -22,3 +22,8 @@ subjects:
   - kind: ServiceAccount
     name: {{ .Values.namespace }}
     namespace: {{ .Values.namespace }}
+  {{- range .Values.extraSubjects }}
+  - kind: ServiceAccount
+    name: {{ . }}
+    namespace: flux-system
+  {{- end }}

@@ -9,6 +9,10 @@ spec:
   url: {{ .Values.repository.url }}
   ref:
     branch: {{ .Values.repository.branch }}
+  {{- if .Values.repository.secretRef.name }}
+  secretRef:
+    name: {{ .Values.repository.secretRef.name }}
+  {{- end }}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

@@ -16,6 +16,13 @@ repository:
   url: https://github.com/my-org/my-repo
   branch: main
   path: ./
+  secretRef:
+    name: ""
+
+extraSubjects: []
+# example:
+# extraSubjects:
+#   - my-team
 
 networkPolicy:
   endpointSelector: {}

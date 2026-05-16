@@ -102,6 +102,10 @@ Adding a new tenant means creating a folder with a HelmRelease, committing it â€
 
 ## Changelog
 
+### 0.2.0
+- **feat**: Optional `secretRef` for private Git repositories in Flux GitRepository
+- **feat**: Optional `extraSubjects` to bind additional ServiceAccounts to the tenant RoleBinding
+
 ### 0.1.0
 - Initial release
 - Namespace, RBAC, ResourceQuota, CiliumNetworkPolicy, Flux source and Kustomization per tenant
