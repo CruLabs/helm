@@ -26,13 +26,13 @@ The HelmRepository is deployed once globally, each tenant gets its own HelmRelea
 ```yaml
 # tenants/_helmrepository.yaml
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: GitRepository
 metadata:
-  name: internal-charts
+  name: crulabs-helm
   namespace: flux-system
 spec:
-  interval: 24h
-  url: https://github.com/my-org/helm
+  interval: 10m
+  url: https://github.com/crulabs/helm
   ref:
     branch: main
 ```
