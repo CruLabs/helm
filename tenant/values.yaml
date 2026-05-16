@@ -1,0 +1,31 @@
+namespace: my-namespace
+team: my-team
+
+ResourceQuota:
+  requests:
+    cpu: "1"
+    memory: "2Gi"
+    storage: "10Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
+  pods: "20"
+
+repository:
+  kind: GitRepository
+  url: https://github.com/my-org/my-repo
+  branch: main
+  path: ./
+
+networkPolicy:
+  endpointSelector: {}
+  ingress: []
+  egress: []
+  # ingress:
+  #   - fromNamespace:
+  #       k8s:io.kubernetes.pod.namespace: gateway-system
+  #   - fromNamespace:
+  #       k8s:io.kubernetes.pod.namespace: monitoring
+  # egress:
+  #   - toNamespace:
+  #       k8s:io.kubernetes.pod.namespace: database

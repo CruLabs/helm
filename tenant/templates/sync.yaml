@@ -1,0 +1,26 @@
+# templates/sync.yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: {{ .Values.repository.kind }}
+metadata:
+  name: {{ .Values.namespace }}-repo
+  namespace: {{ .Values.namespace }}
+spec:
+  interval: 10m
+  url: {{ .Values.repository.url }}
+  ref:
+    branch: {{ .Values.repository.branch }}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+spec:
+  interval: 1h
+  sourceRef:
+    kind: {{ .Values.repository.kind }}
+    name: {{ .Values.namespace }}-repo
+  path: {{ .Values.repository.path }}
+  prune: true
+  targetNamespace: {{ .Values.namespace }}
+  serviceAccountName: {{ .Values.namespace }}

@@ -1,0 +1,61 @@
+# templates/networkpolicy.yaml
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+spec:
+  endpointSelector: {}
+  ingress:
+    {{- range .Values.networkPolicy.ingress }}
+    - fromEndpoints:
+        - matchLabels:
+            {{- range $key, $value := .fromNamespace }}
+            {{ $key }}: {{ $value }}
+            {{- end }}
+    {{- end }}
+  {{- if .Values.networkPolicy.egress }}
+  egress:
+    {{- range .Values.networkPolicy.egress }}
+    - toEndpoints:
+        - matchLabels:
+            {{- range $key, $value := .toNamespace }}
+            {{ $key }}: {{ $value }}
+            {{- end }}
+    {{- end }}
+  {{- end }}# templates/networkpolicy.yaml
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+spec:
+  endpointSelector:
+    {{- if .Values.networkPolicy.endpointSelector }}
+    matchLabels:
+      {{- range $key, $value := .Values.networkPolicy.endpointSelector }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+    {{- else }}
+    matchLabels: {}
+    {{- end }}
+  {{- if .Values.networkPolicy.ingress }}
+  ingress:
+    {{- range .Values.networkPolicy.ingress }}
+    - fromEndpoints:
+        - matchLabels:
+            {{- range $key, $value := .fromNamespace }}
+            {{ $key }}: {{ $value }}
+            {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.networkPolicy.egress }}
+  egress:
+    {{- range .Values.networkPolicy.egress }}
+    - toEndpoints:
+        - matchLabels:
+            {{- range $key, $value := .toNamespace }}
+            {{ $key }}: {{ $value }}
+            {{- end }}
+    {{- end }}
+  {{- end }}

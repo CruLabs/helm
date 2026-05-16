@@ -1,0 +1,24 @@
+# templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    toolkit.fluxcd.io/tenant: {{ .Values.team }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    toolkit.fluxcd.io/tenant: {{ .Values.team }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.namespace }}
+    namespace: {{ .Values.namespace }}

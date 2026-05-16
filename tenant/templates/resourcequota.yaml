@@ -1,0 +1,16 @@
+# templates/resourcequota.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    toolkit.fluxcd.io/tenant: {{ .Values.team }}
+spec:
+  hard:
+    requests.cpu: {{ .Values.ResourceQuota.requests.cpu }}
+    requests.memory: {{ .Values.ResourceQuota.requests.memory }}
+    requests.storage: {{ .Values.ResourceQuota.requests.storage }}
+    limits.cpu: {{ .Values.ResourceQuota.limits.cpu }}
+    limits.memory: {{ .Values.ResourceQuota.limits.memory }}
+    pods: {{ .Values.ResourceQuota.pods }}
