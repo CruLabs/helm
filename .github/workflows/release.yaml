@@ -1,0 +1,23 @@
+on:
+  push:
+    tags:
+      - 'tenant-*'
+      - 'cnpg-cluster-*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u $ --password-stdin
+
+      - name: Get chart name from tag
+        id: chart
+        run: echo "name=$(echo ${{ github.ref_name }} | sed 's/-[0-9].*//')" >> $GITHUB_OUTPUT
+
+      - name: Package and Push
+        run: |
+          helm package ${{ steps.chart.outputs.name }}/
+          helm push ${{ steps.chart.outputs.name }}-*.tgz oci://ghcr.io/crulabs/helm
