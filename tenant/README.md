@@ -21,20 +21,23 @@ This Helm Chart manages Flux CD tenants in a Kubernetes cluster. Instead of copy
 
 ## Installation
 
-The HelmRepository is deployed once globally, each tenant gets its own HelmRelease:
+The OCIRepository is deployed once globally, each tenant gets its own HelmRelease:
 
 ```yaml
 # tenants/_helmrepository.yaml
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
+kind: OCIRepository
 metadata:
-  name: crulabs-helm
+  name: tenant
   namespace: flux-system
 spec:
-  interval: 10m
-  url: https://github.com/crulabs/helm
+  interval: 24h
+  url: oci://ghcr.io/crulabs/helm/tenant
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
   ref:
-    branch: main
+    tag: "0.2.0"
 ```
 
 ```yaml
@@ -46,13 +49,10 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  chart:
-    spec:
-      chart: tenant
-      sourceRef:
-        kind: HelmRepository
-        name: internal-charts
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: tenant
+    namespace: flux-system
   values:
     namespace: team-alpha
     team: team-alpha

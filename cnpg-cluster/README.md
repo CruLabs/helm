@@ -34,15 +34,18 @@ Typically, the chart is deployed in Flux with a HelmRelease inside a namespace:
 ```yaml
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
+kind: OCIRepository
 metadata:
-  name: crulabs-charts
-  namespace: flux-system
+  name: cnpg-cluster
+  namespace: <namespace>
 spec:
   interval: 24h
-  url: https://github.com/crulabs/helm
+  url: oci://ghcr.io/crulabs/helm/cnpg-cluster
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
   ref:
-    branch: main
+    tag: "0.2.0"
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -51,13 +54,9 @@ metadata:
   namespace: <namespace>
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: ./cnpg-cluster
-      sourceRef:
-        kind: GitRepository
-        name: crulabs-charts
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: cnpg-cluster
   values:
     # configuration values go here
 ```
