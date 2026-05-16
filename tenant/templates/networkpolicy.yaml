@@ -16,21 +16,9 @@ spec:
     {{- end }}
   {{- if .Values.networkPolicy.ingress }}
   ingress:
-    {{- range .Values.networkPolicy.ingress }}
-    - fromEndpoints:
-        - matchLabels:
-            {{- range $key, $value := .fromNamespace }}
-            {{ $key }}: {{ $value }}
-            {{- end }}
-    {{- end }}
+    {{- toYaml .Values.networkPolicy.ingress | nindent 4 }}
   {{- end }}
   {{- if .Values.networkPolicy.egress }}
   egress:
-    {{- range .Values.networkPolicy.egress }}
-    - toEndpoints:
-        - matchLabels:
-            {{- range $key, $value := .toNamespace }}
-            {{ $key }}: {{ $value }}
-            {{- end }}
-    {{- end }}
+    {{- toYaml .Values.networkPolicy.egress | nindent 4 }}
   {{- end }}
