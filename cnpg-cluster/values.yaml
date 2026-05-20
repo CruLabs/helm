@@ -6,6 +6,10 @@ initdb:
   owner: app
   secret:
     name: cnpg-app-user
+  postInitSQL: []
+  # Example of postInitSQL:
+  # postInitSQL:
+  #   - "CREATE TABLE IF NOT EXISTS demo (id INT PRIMARY KEY);"
 
 enableSuperuserAccess: false
 superuserSecret:

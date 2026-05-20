@@ -13,6 +13,10 @@ spec:
       owner: {{ .Values.initdb.owner }}
       secret:
         name: {{ .Values.initdb.secret.name }}
+      {{- if .Values.initdb.postInitSQL }}
+      postInitSQL:
+        {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
+      {{- end }}
 
   enableSuperuserAccess: {{ .Values.enableSuperuserAccess }}
   superuserSecret:

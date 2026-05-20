@@ -1,6 +1,6 @@
 # cloudnative-pg
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativePG](https://cloudnative-pg.io) cluster in Kubernetes.
 
@@ -13,6 +13,7 @@ This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativ
 - [Parameters](#parameters)
 - [Roadmap](#roadmap)
 - [References](#references)
+- [Changelog](#changelog)
 
 ## Features
 
@@ -116,6 +117,8 @@ stringData:
 | `initdb.database`         | Default database name                            | `""` defaults to release name |
 | `initdb.owner`            | Database owner                                   | `app` |
 | `initdb.secret.name`      | Secret containing user credentials               | `cnpg-app-user` |
+| `initdb.postInitSQL`      | List of SQL queries to be executed as a superuser in the postgres
+database right after the cluster has been created | `[]`|
 | `enableSuperuserAccess`   | Enable/disable superuser access                  | `false` |
 | `superuserSecret.name`    | Secret with superuser credentials                | `cnpg-superuser` |
 | `storageClass`            | StorageClass for PVCs                            | `local-path` |
@@ -140,6 +143,11 @@ stringData:
 - [CloudNativePG Documentation](https://cloudnative-pg.io/documentation/) 
 
 ## Changelog
+
+### 0.3.0
+- Add support for `initdb.postInitSQL` in CNPG cluster chart
+- Allow execution of SQL statements after cluster initialization
+- README documentation for post-init SQL usage
 
 ### 0.2.0
 - **fix**: Set `backupOwnerReference: cluster` in ScheduledBackup to ensure old backup objects are automatically cleaned up according to the retention policy
