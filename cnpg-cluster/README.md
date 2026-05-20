@@ -1,6 +1,6 @@
 # cloudnative-pg
 
-![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativePG](https://cloudnative-pg.io) cluster in Kubernetes.
 
@@ -144,6 +144,9 @@ database right after the cluster has been created | `[]` |
 - [CloudNativePG Documentation](https://cloudnative-pg.io/documentation/) 
 
 ## Changelog
+
+### 0.4.1
+- fix for wrong value path
 
 ### 0.4.0
 - Add support for `initdb.postInitApplicationSQL` in CNPG cluster chart

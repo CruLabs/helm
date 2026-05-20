@@ -19,7 +19,7 @@ spec:
       {{- end }}
       {{- if .Values.initdb.postInitApplicationSQL }}
       postInitApplicationSQL:
-        {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
+        {{- .Values.initdb.postInitApplicationSQL | toYaml | nindent 6 }}
       {{- end }}
 
   enableSuperuserAccess: {{ .Values.enableSuperuserAccess }}
