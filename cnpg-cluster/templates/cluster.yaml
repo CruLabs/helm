@@ -17,6 +17,10 @@ spec:
       postInitSQL:
         {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
       {{- end }}
+      {{- if .Values.initdb.postInitApplicationSQL }}
+      postInitApplicationSQL:
+        {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
+      {{- end }}
 
   enableSuperuserAccess: {{ .Values.enableSuperuserAccess }}
   superuserSecret:

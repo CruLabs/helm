@@ -1,6 +1,6 @@
 # cloudnative-pg
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativePG](https://cloudnative-pg.io) cluster in Kubernetes.
 
@@ -118,7 +118,8 @@ stringData:
 | `initdb.owner`            | Database owner                                   | `app` |
 | `initdb.secret.name`      | Secret containing user credentials               | `cnpg-app-user` |
 | `initdb.postInitSQL`      | List of SQL queries to be executed as a superuser in the postgres
-database right after the cluster has been created | `[]`|
+database right after the cluster has been created | `[]` |
+| `initdb.postInitApplicationSQL' | List of SQL queries to be executed as a superuser in app database | `[]` |
 | `enableSuperuserAccess`   | Enable/disable superuser access                  | `false` |
 | `superuserSecret.name`    | Secret with superuser credentials                | `cnpg-superuser` |
 | `storageClass`            | StorageClass for PVCs                            | `local-path` |
@@ -143,6 +144,11 @@ database right after the cluster has been created | `[]`|
 - [CloudNativePG Documentation](https://cloudnative-pg.io/documentation/) 
 
 ## Changelog
+
+### 0.4.0
+- Add support for `initdb.postInitApplicationSQL` in CNPG cluster chart
+- Allow execution of SQL statements for application database after cluster initialization
+- README documentation for usage
 
 ### 0.3.0
 - Add support for `initdb.postInitSQL` in CNPG cluster chart

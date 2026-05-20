@@ -7,8 +7,14 @@ initdb:
   secret:
     name: cnpg-app-user
   postInitSQL: []
+  # Runs in default "postgres" database after cluster initialization
   # Example of postInitSQL:
   # postInitSQL:
+  #   - "CREATE ROLE app WITH LOGIN PASSWORD 'password';"
+  postInitApplicationSQL: []
+  # Runs in app database only (database specified in initdb.database) after postInitSQL
+  # Example of postInitApplicationSQL:
+  # postInitApplicationSQL:
   #   - "CREATE TABLE IF NOT EXISTS demo (id INT PRIMARY KEY);"
 
 enableSuperuserAccess: false
