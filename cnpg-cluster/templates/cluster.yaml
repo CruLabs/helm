@@ -45,10 +45,10 @@ spec:
       endpointURL: {{ .Values.backup.endpointURL | default $bucketHost }}
       s3Credentials:
         accessKeyId:
-          name: {{ .Values.backup.secret.name | default .Release.Name }}
+          name: {{ .Values.backup.secret.name | default printf( "%s-backups" .Release.Name ) }}
           key: AWS_ACCESS_KEY_ID
         secretAccessKey:
-          name: {{ .Values.backup.secret.name | default .Release.Name }}
+          name: {{ .Values.backup.secret.name | default printf( "%s-backups" .Release.Name ) }}
           key: AWS_SECRET_ACCESS_KEY
       wal:
         compression: gzip
