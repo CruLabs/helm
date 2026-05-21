@@ -26,11 +26,11 @@ storage:
   size: 5Gi
 
 backup:
-  enabled: true
-  destinationPath: "" # defaults to s3://<release-name>
-  endpointURL: http://minio.minio.svc.cluster.local:9000
+  enabled: false
+  destinationPath: ""
+  endpointURL: ""
   secret:
-    name: backup-credentials
+    name: ""
   schedule: "0 0 0 * * *" # daily at midnight
   retentionPolicy: "30d"
 

@@ -31,17 +31,25 @@ spec:
     size: {{ .Values.storage.size }}
 
 {{- if .Values.backup.enabled }}
+{{- $obc := printf "%s-backups" .Release.Name }}
+{{- $bucketConfig := (lookup "v1" "ConfigMap" .Release.Namespace $obc) }}
+{{- $bucketName := .Values.backup.destinationPath | default "" }}
+{{- $bucketHost := .Values.backup.endpointURL | default "" }}
+{{- if $bucketConfig.data }}
+{{- $bucketName = printf "s3://%s/" (get $bucketConfig.data "BUCKET_NAME") }}
+{{- $bucketHost = printf "http://%s:%s" (get $bucketConfig.data "BUCKET_HOST") (get $bucketConfig.data "BUCKET_PORT") }}
+{{- end }}
   backup:
     barmanObjectStore:
-      destinationPath: {{ .Values.backup.destinationPath | default (printf "s3://%s/" .Release.Name) }}
-      endpointURL: {{ .Values.backup.endpointURL }}
+      destinationPath: {{ .Values.backup.destinationPath | default $bucketName }}
+      endpointURL: {{ .Values.backup.endpointURL | default $bucketHost }}
       s3Credentials:
         accessKeyId:
-          name: {{ .Values.backup.secret.name }}
-          key: ACCESS_KEY_ID
+          name: {{ .Values.backup.secret.name | default .Release.Name }}
+          key: AWS_ACCESS_KEY_ID
         secretAccessKey:
-          name: {{ .Values.backup.secret.name }}
-          key: ACCESS_SECRET_KEY
+          name: {{ .Values.backup.secret.name | default .Release.Name }}
+          key: AWS_SECRET_ACCESS_KEY
       wal:
         compression: gzip
       data:
