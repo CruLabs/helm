@@ -4,14 +4,17 @@ Helm charts for the CruLabs cluster.
 
 ## Charts
 
-- **tenant** - Manages Flux CD tenants
-- **cnpg-cluster** - CloudNativePG cluster wrapper
+| Name           | Description                          |
+|----------------|--------------------------------------|
+| [tenant](./tenant)       | Manages Flux CD tenants              |
+| [cnpg-cluster](./cnpg-cluster)   | CloudNativePG cluster wrapper        |
 
-## Releasing
+## Scope
 
-Tag the chart with the version to trigger a release:
+These Helm charts are purpose-built for the CruLabs Kubernetes cluster.
+They are not official upstream charts and are not intended for generic use without adaptation.
 
-```bash
-git tag tenant-0.2.0
-git push origin tenant-0.2.0
-```
+## Attribution
+
+Some templates in this repository are derived from upstream Helm charts.
+Original projects retain their respective copyrights and licenses.
