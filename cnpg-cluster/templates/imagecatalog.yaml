@@ -1,0 +1,13 @@
+{{- if eq .Values.type "timescaledb" }}
+apiVersion: postgresql.cnpg.io/v1
+kind: ImageCatalog
+metadata:
+  name: {{ .Release.Name }}-timescaledb-ha
+  namespace: {{ .Release.Namespace }}
+spec:
+  images:
+    - major: 16
+      image: timescale/timescaledb-ha:pg16.14-ts2.27.1
+    - major: 18
+      image: timescale/timescaledb-ha:pg18.4-ts2.27.1
+{{ end }}
