@@ -1,0 +1,47 @@
+# This example shows how to deploy a minimal CloudNative-PG cluster with timescaledb and backup enabled.
+# What you get: 5GB of storage, backup to an S3-compatible object store, 
+# and a retention policy of 30 days (meaning that backups will be deleted after 30 days).
+#
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: cnpg-cluster
+  namespace: example
+spec:
+  interval: 24h
+  url: oci://ghcr.io/crulabs/helm/cnpg-cluster
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  ref:
+    tag: "1.x.x" # use the latest 1.x.x version of the chart
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: example-postgres
+  namespace: example
+spec:
+  interval: 5m
+  chartRef:
+    kind: OCIRepository
+    name: cnpg-cluster
+    namespace: example
+  values:
+    type: timescaledb
+    instances: 2
+    storage:
+      size: 10Gi # whatever is needed in your use case
+    backup:
+      enabled: true # enable backup if you want to use it, otherwise it will be disabled by default
+---
+#  Keep in mind to seal your secret before pushing it to Git!
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cnpg-app-user # default or specified in initdb.secret.name
+  namespace: example
+type: kubernetes.io/basic-auth
+stringData:
+  username: app # default or specified in initdb.owner
+  password: <app-user-password>

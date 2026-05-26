@@ -1,5 +1,7 @@
 imageName: ghcr.io/cloudnative-pg/postgresql:17.5
+type: postgres
 instances: 2
+version: 16 # major version, only needed for timescaledb, ignored for postgres
 
 initdb:
   database: "" # defaults to release name

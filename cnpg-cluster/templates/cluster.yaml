@@ -4,9 +4,19 @@ metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
-  imageName: {{ .Values.imageName }}
-  instances: {{ .Values.instances }}
 
+{{- if eq .Values.type "postgres" }}
+  imageName: {{ .Values.imageName }}
+{{- else if eq .Values.type "timescaledb" }}
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ImageCatalog
+    name: {{ .Release.Name }}-timescaledb-ha
+    major: {{ .Values.version }}
+{{- end }}  
+  instances: {{ .Values.instances }}
+  postgresUID: 1000
+  postgresGID: 1000
   bootstrap:
     initdb:
       database: {{ .Values.initdb.database | default .Release.Name }}
@@ -17,10 +27,16 @@ spec:
       postInitSQL:
         {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
       {{- end }}
-      {{- if .Values.initdb.postInitApplicationSQL }}
-      postInitApplicationSQL:
-        {{- .Values.initdb.postInitApplicationSQL | toYaml | nindent 6 }}
+      
+      {{- $sql := .Values.initdb.postInitApplicationSQL | default list }}
+
+      {{- if eq .Values.type "timescaledb" }}
+      {{- $sql = append $sql "CREATE EXTENSION IF NOT EXISTS timescaledb;" }}
       {{- end }}
+
+      postInitApplicationSQL:
+{{ toYaml $sql | nindent 8 }}
+
 
   enableSuperuserAccess: {{ .Values.enableSuperuserAccess }}
   superuserSecret:
@@ -61,6 +77,12 @@ spec:
   affinity:
     enablePodAntiAffinity: {{ .Values.affinity.enablePodAntiAffinity }}
     topologyKey: {{ .Values.affinity.topologyKey }}
+
+{{- if eq .Values.type "timescaledb" }}
+  postgresql:
+    shared_preload_libraries:
+      - timescaledb
+{{- end }}
 
   monitoring:
     enablePodMonitor: {{ .Values.monitoring.enablePodMonitor }}

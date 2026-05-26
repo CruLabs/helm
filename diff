@@ -1,0 +1,175 @@
+diff --git a/cnpg-cluster/README.md b/cnpg-cluster/README.md
+index 8bfc059..7342bd0 100644
+--- a/cnpg-cluster/README.md
++++ b/cnpg-cluster/README.md
+@@ -8,6 +8,7 @@ This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativ
+ 
+ - [Features](#features)
+ - [Installation](#installation)
++- [Examples](./examples/)
+ - [Secrets](#secrets)
+ - [Backups](#backups)
+ - [Parameters](#parameters)
+@@ -62,14 +63,6 @@ spec:
+     # configuration values go here
+ ```
+ 
+-### Minimal Values Configuration
+-
+-```yaml
+-  values:
+-    storage:
+-      size: 5Gi
+-```
+-
+ ## Secrets
+ 
+ When deploying the chart, the creation of Kubernetes secrets for the **database owner** and optionally for **backups** is needed.
+@@ -152,6 +145,7 @@ stringData:
+ | Parameter | Description | Default |
+ |---|---|---|
+ | `imageName` | PostgreSQL container image | `ghcr.io/cloudnative-pg/postgresql:17.5` |
++| `type` | 'postgres' or 'timescaledb' | `2` |
+ | `instances` | Number of cluster instances | `2` |
+ | `initdb.database` | Default database name | `""` defaults to release name |
+ | `initdb.owner` | Database owner | `app` |
+diff --git a/cnpg-cluster/examples/minimal-with-backup.yaml b/cnpg-cluster/examples/minimal-with-backup.yaml
+deleted file mode 100644
+index 430dc20..0000000
+--- a/cnpg-cluster/examples/minimal-with-backup.yaml
++++ /dev/null
+@@ -1,45 +0,0 @@
+-# This example shows how to deploy a minimal CloudNative-PG cluster with backup enabled.
+-# What you get: 5GB of storage, backup to an S3-compatible object store, 
+-# and a retention policy of 30 days (meaning that backups will be deleted after 30 days).
+-#
+-apiVersion: source.toolkit.fluxcd.io/v1
+-kind: OCIRepository
+-metadata:
+-  name: cnpg-cluster
+-  namespace: example
+-spec:
+-  interval: 24h
+-  url: oci://ghcr.io/crulabs/helm/cnpg-cluster
+-  layerSelector:
+-    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+-    operation: copy
+-  ref:
+-    tag: "1.x.x"
+----
+-apiVersion: helm.toolkit.fluxcd.io/v2
+-kind: HelmRelease
+-metadata:
+-  name: example-postgres
+-  namespace: example
+-spec:
+-  interval: 5m
+-  chartRef:
+-    kind: OCIRepository
+-    name: cnpg-cluster
+-    namespace: example
+-  values:
+-    storage:
+-      size: 10Gi # whatever is needed in your use case
+-    backup:
+-      enabled: true # enable backup if you want to use it, otherwise it will be disabled by default
+----
+-#  Keep in mind to seal your secret before pushing it to Git!
+-apiVersion: v1
+-kind: Secret
+-metadata:
+-  name: cnpg-app-user # default or specified in initdb.secret.name
+-  namespace: example
+-type: kubernetes.io/basic-auth
+-stringData:
+-  username: app # default or specified in initdb.owner
+-  password: <app-user-password>
+diff --git a/cnpg-cluster/templates/cluster.yaml b/cnpg-cluster/templates/cluster.yaml
+index e92292a..5698f6a 100644
+--- a/cnpg-cluster/templates/cluster.yaml
++++ b/cnpg-cluster/templates/cluster.yaml
+@@ -4,9 +4,19 @@ metadata:
+   name: {{ .Release.Name }}
+   namespace: {{ .Release.Namespace }}
+ spec:
++
++{{- if eq .Values.type "postgres" }}
+   imageName: {{ .Values.imageName }}
++{{- else if eq .Values.type "timescaledb" }}
++  imageCatalogRef:
++    apiGroup: postgresql.cnpg.io
++    kind: ImageCatalog
++    name: {{ .Release.Name }}-timescaledb-ha
++    major: {{ .Values.version }}
++{{- end }}  
+   instances: {{ .Values.instances }}
+-
++  postgresUID: 1000
++  postgresGID: 1000
+   bootstrap:
+     initdb:
+       database: {{ .Values.initdb.database | default .Release.Name }}
+@@ -17,11 +27,17 @@ spec:
+       postInitSQL:
+         {{- .Values.initdb.postInitSQL | toYaml | nindent 6 }}
+       {{- end }}
+-      {{- if .Values.initdb.postInitApplicationSQL }}
+-      postInitApplicationSQL:
+-        {{- .Values.initdb.postInitApplicationSQL | toYaml | nindent 6 }}
++      
++      {{- $sql := .Values.initdb.postInitApplicationSQL | default list }}
++
++      {{- if eq .Values.type "timescaledb" }}
++      {{- $sql = append $sql "CREATE EXTENSION IF NOT EXISTS timescaledb;" }}
+       {{- end }}
+ 
++      postInitApplicationSQL:
++{{ toYaml $sql | nindent 8 }}
++
++
+   enableSuperuserAccess: {{ .Values.enableSuperuserAccess }}
+   superuserSecret:
+     name: {{ .Values.superuserSecret.name }}
+@@ -62,5 +78,11 @@ spec:
+     enablePodAntiAffinity: {{ .Values.affinity.enablePodAntiAffinity }}
+     topologyKey: {{ .Values.affinity.topologyKey }}
+ 
++{{- if eq .Values.type "timescaledb" }}
++  postgresql:
++    shared_preload_libraries:
++      - timescaledb
++{{- end }}
++
+   monitoring:
+     enablePodMonitor: {{ .Values.monitoring.enablePodMonitor }}
+\ No newline at end of file
+diff --git a/cnpg-cluster/test.yaml b/cnpg-cluster/test.yaml
+index a489286..7489491 100644
+--- a/cnpg-cluster/test.yaml
++++ b/cnpg-cluster/test.yaml
+@@ -1,6 +1,9 @@
+-type: timescaledb
+ instances: 2
++type: timescaledb
+ backup:
+   enabled: false
+ storage:
+-  size: 10Gi
+\ No newline at end of file
++  size: 10Gi
++initdb:
++  postInitApplicationSQL:
++    - CREATE TABLE IF NOT EXISTS demo (id INT PRIMARY KEY);
+\ No newline at end of file
+diff --git a/cnpg-cluster/values.yaml b/cnpg-cluster/values.yaml
+index abb30a4..249b2a4 100644
+--- a/cnpg-cluster/values.yaml
++++ b/cnpg-cluster/values.yaml
+@@ -1,5 +1,7 @@
+ imageName: ghcr.io/cloudnative-pg/postgresql:17.5
++type: postgres
+ instances: 2
++version: 16 # major version, only needed for timescaledb, ignored for postgres
+ 
+ initdb:
+   database: "" # defaults to release name

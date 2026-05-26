@@ -1,6 +1,6 @@
 # cloudnative-pg
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativePG](https://cloudnative-pg.io) cluster in Kubernetes.
 
@@ -8,6 +8,7 @@ This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativ
 
 - [Features](#features)
 - [Installation](#installation)
+- [Examples](./examples/)
 - [Secrets](#secrets)
 - [Backups](#backups)
 - [Parameters](#parameters)
@@ -60,14 +61,6 @@ spec:
     name: cnpg-cluster
   values:
     # configuration values go here
-```
-
-### Minimal Values Configuration
-
-```yaml
-  values:
-    storage:
-      size: 5Gi
 ```
 
 ## Secrets
@@ -152,7 +145,9 @@ stringData:
 | Parameter | Description | Default |
 |---|---|---|
 | `imageName` | PostgreSQL container image | `ghcr.io/cloudnative-pg/postgresql:17.5` |
+| `type` | 'postgres' or 'timescaledb' | `postgres` |
 | `instances` | Number of cluster instances | `2` |
+| `version` |  major version, only needed for timescaledb, ignored for postgres (number, not string) | `16` |
 | `initdb.database` | Default database name | `""` defaults to release name |
 | `initdb.owner` | Database owner | `app` |
 | `initdb.secret.name` | Secret containing user credentials | `cnpg-app-user` |
@@ -182,6 +177,19 @@ stringData:
 - [Rook/Ceph Object Storage](https://rook.io/docs/rook/latest/Storage-Configuration/Object-Storage-RGW/object-storage/)
 
 ## Changelog
+
+### 1.1.0
+- introduce `type` switch between postgres and timescaledb
+- add ImageCatalogRef support for TimescaleDB deployments
+- refactor postInitApplicationSQL handling to always render a valid array
+- ensure CNPG compatibility by preventing null values in SQL configuration
+- add automatic TimescaleDB extension injection for timescaledb type
+- add shared_preload_libraries configuration for TimescaleDB
+- add examples directory reference in README
+- remove outdated minimal-with-backup example
+- improve test values and introduce version field for major DB selection
+- ensure Helm templates are safe for server-side apply (typed validation fixes)
+
 ### 1.0.2
 - Fix malformed `printf` call in cluster template causing render error
 
