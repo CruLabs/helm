@@ -3,6 +3,9 @@ type: postgres
 instances: 2
 version: 16 # major version, only needed for timescaledb, ignored for postgres
 
+postgresUID: 
+postgresGID: 
+
 initdb:
   database: "" # defaults to release name
   owner: app

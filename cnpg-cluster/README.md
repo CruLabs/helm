@@ -1,6 +1,6 @@
 # cloudnative-pg
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This cloudnative-pg Helm Chart is a simple wrapper chart to deploy a [CloudNativePG](https://cloudnative-pg.io) cluster in Kubernetes.
 
@@ -177,6 +177,10 @@ stringData:
 - [Rook/Ceph Object Storage](https://rook.io/docs/rook/latest/Storage-Configuration/Object-Storage-RGW/object-storage/)
 
 ## Changelog
+
+### 1.1.1
+
+- **fix**: `postgresUID` and `postgresGID` are now dynamically set based on `.Values.type` to prevent immutability conflicts on existing PostgreSQL clusters. TimescaleDB uses UID/GID 1000, all other types fall back to 26.
 
 ### 1.1.0
 - introduce `type` switch between postgres and timescaledb

@@ -15,8 +15,8 @@ spec:
     major: {{ .Values.version }}
 {{- end }}  
   instances: {{ .Values.instances }}
-  postgresUID: 1000
-  postgresGID: 1000
+  postgresUID: {{ if eq .Values.type "timescaledb" }}1000{{ else }}26{{ end }}
+  postgresGID: {{ if eq .Values.type "timescaledb" }}1000{{ else }}26{{ end }}
   bootstrap:
     initdb:
       database: {{ .Values.initdb.database | default .Release.Name }}
