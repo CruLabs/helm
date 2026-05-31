@@ -1,6 +1,6 @@
 # tenant-access
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This Helm Chart manages tenant access in a Kubernetes cluster. It creates ServiceAccounts per user, RoleBindings in the appropriate tenant namespaces based on team membership, and automatically generates kubeconfig files stored as Secrets.
 
@@ -121,6 +121,9 @@ kubectl get secret <username>-kubeconfig -n tenant-access \
 Remove the user from `users` in the values and commit. Flux reconciles the chart and removes the ServiceAccount, Token Secret, kubeconfig Secret and all RoleBinding subjects for that user.
 
 ## Changelog
+
+### 0.1.2
+- **fix:** replaced `registry.k8s.io/kubectl` distroless image with `alpine/k8s:1.35.0` in the kubeconfig generator hook job
 
 ### 0.1.1
 - **fix:** use `/bin/sh` instead of `/bin/bash` in kubeconfig generator script
