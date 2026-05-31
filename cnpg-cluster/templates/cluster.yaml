@@ -45,6 +45,10 @@ spec:
   storage:
     storageClass: {{ .Values.storageClass }}
     size: {{ .Values.storage.size }}
+  {{with .Values.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{ end }}
 
 {{- if .Values.backup.enabled }}
 {{- $obc := printf "%s-backups" .Release.Name }}
