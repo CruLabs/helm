@@ -23,7 +23,7 @@ spec:
             - |
               set -e
 
-              NAMESPACE=$(cat /config/namespace)
+              NAMESPACE={{ .Release.Namespace | quote }}
               API_SERVER="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
               USERS=$(cat /config/users)
 
