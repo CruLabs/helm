@@ -1,6 +1,6 @@
 # tenant-access
 
-![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This Helm Chart manages tenant access in a Kubernetes cluster. It creates ServiceAccounts per user, RoleBindings in the appropriate tenant namespaces based on team membership, and automatically generates kubeconfig files stored as Secrets.
 
@@ -53,6 +53,8 @@ spec:
     name: tenant-access
     namespace: flux-system
   values:
+    apiServer: "https://k8s.example.io:6443"
+
     teams:
       - name: team-a
         namespaces:
@@ -76,6 +78,7 @@ spec:
 
 | Parameter | Description | Default |
 |---|---|---|
+| `apiServer` | API server address with port | `https://k8s.example.io:6443` |
 | `teams` | List of teams with their namespaces | `[]` |
 | `teams[].name` | Team name | `""` |
 | `teams[].namespaces` | List of namespaces this team has access to | `[]` |
@@ -121,6 +124,9 @@ kubectl get secret <username>-kubeconfig -n tenant-access \
 Remove the user from `users` in the values and commit. Flux reconciles the chart and removes the ServiceAccount, Token Secret, kubeconfig Secret and all RoleBinding subjects for that user.
 
 ## Changelog
+### 0.1.4
+- configure API server in values.yaml via `apiServer`
+
 ### 0.1.3
 - **fix:** `namespace` field in `tenant-users-config` ConfigMap was empty because it referenced `Values.namespace` which no longer exists, now replaced with `Release.Namespace`
 
