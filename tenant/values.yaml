@@ -15,6 +15,7 @@ repository:
   kind: GitRepository
   url: https://github.com/my-org/my-repo
   branch: main
+  interval: 10m
   path: ./
   secretRef:
     name: ""

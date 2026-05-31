@@ -20,7 +20,7 @@ metadata:
   name: {{ .Values.namespace }}
   namespace: {{ .Values.namespace }}
 spec:
-  interval: 1h
+  interval: {{ .Values.repository.interval }}
   sourceRef:
     kind: {{ .Values.repository.kind }}
     name: {{ .Values.namespace }}-repo

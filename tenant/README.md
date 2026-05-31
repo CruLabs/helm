@@ -1,6 +1,6 @@
 # tenant
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 This Helm Chart manages Flux CD tenants in a Kubernetes cluster. Instead of copying namespace, RBAC, quota and network policy manifests for every team, a single HelmRelease per tenant is enough.
 
@@ -37,7 +37,7 @@ spec:
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
   ref:
-    tag: "0.2.0"
+    tag: "0.2.1"
 ```
 
 ```yaml
@@ -76,6 +76,7 @@ spec:
       url: https://github.com/my-org/team-alpha
       branch: main
       path: ./deploy
+      interval: 10m
 ```
 
 Adding a new tenant means creating a folder with a HelmRelease, committing it â€” Flux takes care of the rest.
@@ -99,8 +100,12 @@ Adding a new tenant means creating a folder with a HelmRelease, committing it â€
 | `repository.url` | Git repository URL | `""` |
 | `repository.branch` | Git branch | `main` |
 | `repository.path` | Kustomization path in repo | `""` |
+| `repository.interval` | Sync interval | `"10m"` |
+
 
 ## Changelog
+### 0.2.1
+ - Sync intervall for repository is nur configurable in values.yaml through `repository.interval`
 
 ### 0.2.0
 - **feat**: Optional `secretRef` for private Git repositories in Flux GitRepository
