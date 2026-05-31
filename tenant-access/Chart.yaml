@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tenant-access
+description: Manages tenant users, ServiceAccounts, RoleBindings and kubeconfigs across team namespaces
+type: application
+version: 0.1.0
+keywords:
+  - tenant
+  - rbac
+  - users
+  - kubeconfig

@@ -1,0 +1,25 @@
+teams: []
+# teams:
+#   - name: team-a
+#     namespaces:
+#       - team-a-dev
+#       - team-a-staging
+#   - name: team-b
+#     namespaces:
+#       - team-b-dev# teams:
+#   - name: team-a
+#     namespaces:
+#       - team-a-dev
+#       - team-a-staging
+#   - name: team-b
+#     namespaces:
+#       - team-b-dev
+users: []
+# users:
+#   - name: user-a
+#     teams:
+#       - team-a
+#       - team-b
+#   - name: user-b
+#     teams:
+#       - team-a

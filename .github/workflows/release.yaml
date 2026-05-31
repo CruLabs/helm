@@ -2,6 +2,7 @@ on:
   push:
     tags:
       - 'tenant-*'
+      - 'tenant-access-*'
       - 'cnpg-cluster-*'
 
 jobs:
@@ -23,4 +24,4 @@ jobs:
       - name: Package and Push
         run: |
           helm package ${{ steps.chart.outputs.name }}/
-          helm push ${{ steps.chart.outputs.name }}-*.tgz oci://ghcr.io/crulabs/helm
+          helm push ${{ steps.chart.outputs.name }}-*.tgz oci://ghcr.io/crulabs/charts

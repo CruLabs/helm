@@ -1,0 +1,88 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tenant-kubeconfig-generator
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      serviceAccountName: tenant-kubeconfig-hook
+      restartPolicy: OnFailure
+      containers:
+        - name: kubeconfig-generator
+          image: registry.k8s.io/kubectl:v1.35.4
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+
+              NAMESPACE=$(cat /config/namespace)
+              API_SERVER="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+              USERS=$(cat /config/users)
+
+              # Cluster CA from the running pod
+              CA_DATA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt | base64 -w 0)
+
+              for USER in $USERS; do
+                echo "Generating kubeconfig for user: $USER"
+
+                # Wait for token to be populated
+                for i in $(seq 1 10); do
+                  TOKEN=$(kubectl get secret ${USER}-token -n ${NAMESPACE} -o jsonpath='{.data.token}' 2>/dev/null | base64 -d)
+                  if [ -n "$TOKEN" ]; then
+                    break
+                  fi
+                  echo "Waiting for token secret for $USER..."
+                  sleep 2
+                done
+
+                if [ -z "$TOKEN" ]; then
+                  echo "ERROR: Could not get token for $USER"
+                  continue
+                fi
+
+                KUBECONFIG=$(cat <<EOF
+              apiVersion: v1
+              kind: Config
+              clusters:
+              - cluster:
+                  certificate-authority-data: ${CA_DATA}
+                  server: ${API_SERVER}
+                name: crulabs
+              contexts:
+              - context:
+                  cluster: crulabs
+                  user: ${USER}
+                name: crulabs
+              current-context: crulabs
+              users:
+              - name: ${USER}
+                user:
+                  token: ${TOKEN}
+              EOF
+              )
+
+                # Store kubeconfig as secret
+                kubectl create secret generic ${USER}-kubeconfig \
+                  --from-literal=kubeconfig="$KUBECONFIG" \
+                  --namespace=${NAMESPACE} \
+                  --dry-run=client -o yaml | kubectl apply -f -
+
+                echo "Kubeconfig for $USER stored in secret ${USER}-kubeconfig"
+              done
+
+              echo "Done."
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: tenant-users-config
